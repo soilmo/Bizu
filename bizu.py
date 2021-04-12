@@ -46,7 +46,7 @@ if nivel != '' and materia != '' and tipo != ''  and genero != '':
     url = 'https://github.com/soilmo/Bizu/raw/main/profs.csv?raw=true'
     #url = 'https://github.com/soilmo/Evernote/raw/main/profs.csv'
     #url = 'C:\\Users\\pedro\\Dropbox\\Bizu\\profs.csv'
-    df = pd.read_csv(url, sep = ';')
+    df = pd.read_csv(url, sep =';')
     # Filtro tipo
     if tipo == 'Presencial':
         filtro = df['presencial']=="Sim"
@@ -74,12 +74,12 @@ if nivel != '' and materia != '' and tipo != ''  and genero != '':
     # Ordenar pelo valor
     if tipo == 'Presencial':
         df = df.sort_values(by = ['valor_presencial','idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula presencial', min_value=df['valor_presencial'].min(), max_value=df['valor_presencial'].max())
+        maximo = st.slider('Faixa de preço da aula presencial', min_value=int(df['valor_presencial'].min()), max_value=int(df['valor_presencial'].max()))
         filtro = df['valor_presencial']<=maximo
         df = df[filtro]
     elif tipo == "Online":
         df = df.sort_values(by = ['valor_online','idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula online', min_value=df['valor_online'].min(), max_value=df['valor_online'].max())
+        maximo = st.slider('Faixa de preço da aula online', min_value=int(df['valor_online'].min()), max_value=int(df['valor_online'].max()))
         filtro = df['valor_online']<=maximo
         df = df[filtro]
 
