@@ -22,8 +22,8 @@ dict_niveis = {
 
 # Coluna do lado
 
-image = Image.open("C:\\Users\\pedro\\Dropbox\\Bizu\\bizu_logo_pq_trans.png")
-st.sidebar.image(image,use_column_width=True,  width= 20, )
+#image = Image.open("https://github.com/soilmo/Bizu/blob/main/bizu_logo_pq_trans.png")
+#st.sidebar.image(image,use_column_width=True,  width= 20, )
 
 st.sidebar.title("Bizu Aulas Particulares")
 
