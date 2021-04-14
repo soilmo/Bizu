@@ -40,11 +40,12 @@ tipo = st.selectbox("Presencial ou online?",['','Presencial','Online'])
 # Genero do prof
 genero = st.selectbox("Preferência pelo gênero do professor?", ['', 'Tanto faz', 'Mulher', 'Homem'])
 
+flag = 0
 if nivel != '' and materia != '' and tipo != ''  and genero != '':
     
     # Ler base
     url = 'https://github.com/soilmo/Bizu/raw/main/profs.csv?raw=true'
-    df = pd.read_csv(url, sep =';', encoding='latin-1')
+    df = pd.read_csv(url, encoding='utf-8')
     # Filtro tipo
     if tipo == 'Presencial':
         filtro = df['presencial']=="Sim"
@@ -64,54 +65,63 @@ if nivel != '' and materia != '' and tipo != ''  and genero != '':
     filtro = df[dict_niveis[nivel]+"_"+dict_materias[materia]]==1
     df = df[filtro]
     
-    if genero == 'Mulher':
+    if genero == 'Mulher' and df.shape[0] > 0:
         st.header("Total de "+str(df.shape[0])+" professoras nesse perfil :smile:")
-    else:
+        st.subheader("Marque a caixinha para ver o perfil completo do Professor")
+    elif genero == 'Mulher' and df.shape[0] == 1:
+        st.header("Total de "+str(df.shape[0])+" professora nesse perfil :smile:")
+    elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] == 1:
+        st.header("Total de "+str(df.shape[0])+" professor nesse perfil :smile:")
+        st.subheader("Marque a caixinha para ver o perfil completo do Professor")
+    elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] > 0:
         st.header("Total de "+str(df.shape[0])+" professores nesse perfil :smile:")
+        st.subheader("Marque a caixinha para ver o perfil completo do Professor")
+    elif df.shape[0]==0:
+        st.header("Ainda não temos nenhum professor nesse perfil")
 
     # Ordenar pelo valor
-    if tipo == 'Presencial':
-        df = df.sort_values(by = ['valor_presencial_'+dict_niveis[nivel],'idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=int(df['valor_presencial_'+dict_niveis[nivel]].min()), max_value=int(df['valor_presencial_'+dict_niveis[nivel]].max()))
-        filtro = df['valor_presencial_'+dict_niveis[nivel]]<=maximo
+    if tipo == 'Presencial' and df.shape[0] > 0:
+        df = df.sort_values(by = ['valor_presencial_'+str(dict_niveis[nivel]),'idade'], ascending = True)
+        maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()),step=5)
+        filtro = df['valor_presencial_'+str(dict_niveis[nivel])]<=maximo
         df = df[filtro]
-    elif tipo == "Online":
+        flag = 1
+    elif tipo == "Online" and df.shape[0] > 0:
         df = df.sort_values(by = ['valor_online_'+dict_niveis[nivel],'idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=int(df['valor_online_'+dict_niveis[nivel]].min()), max_value=int(df['valor_online_'+dict_niveis[nivel]].max()))
-        filtro = df['valor_online_'+dict_niveis[nivel]]<=maximo
+        maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_online_'+str(dict_niveis[nivel])].max()), step =5)
+        filtro = df['valor_online_'+str(dict_niveis[nivel])]<=maximo
         df = df[filtro]
+        flag = 1
 
-    # Filtro idade
-    max_idade = st.slider('Faixa de idade. Mova o intervalo para filtrar os professores.', min_value=int(df['idade'].min()), max_value=int(df['idade'].max()))
-    filtro = df['idade']<=max_idade
-    df = df[filtro]
+    if df.shape[0]>0:
 
-    for i in range(df.shape[0]):
-        
-        nome = df['nome'].iloc[i]
-        titulo = df['titulo'].iloc[i]
-        metodologia = df['metodologia'].iloc[i]
-        motivacao = df['motivacao'].iloc[i]
-        curriculo = df['curriculo'].iloc[i]
-        link_zap = df['link_zap'].iloc[i]
-        idade = df['idade'].iloc[i]
+        for i in range(df.shape[0]):
+            
+            nome = df['nome'].iloc[i]
+            titulo = df['titulo'].iloc[i]
+            metodologia = df['metodologia'].iloc[i]
+            motivacao = df['motivacao'].iloc[i]
+            curriculo = df['curriculo'].iloc[i]
+            link_zap = df['link_zap'].iloc[i]
+            idade = df['idade'].iloc[i]
 
-        if tipo == 'Presencial':
-            valor = df['valor_presencial_'+dict_niveis[nivel]].iloc[i]
-        elif tipo == "Online":
-            valor = df['valor_online_'+dict_niveis[nivel]].iloc[i]
+            if tipo == 'Presencial':
+                valor = df['valor_presencial_'+str(dict_niveis[nivel])].iloc[i]
+            elif tipo == "Online":
+                valor = df['valor_online_'+str(dict_niveis[nivel])].iloc[i]
 
-        st.subheader(str(nome) +" - R$ "+ str(valor) + "/hora")
-        st.text(titulo)
-
-        if st.checkbox("Ver perfil completo de " + str(nome)):
-            st.markdown("*Metodologia:*\n" + str(metodologia))
-            st.markdown("*Motivação:*\n" + str(motivacao))
-            st.markdown("*Currículo:*\n" + str(curriculo))
-            st.markdown("*Idade:*\n" + str(idade))
-            t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
-            link = f'[{t}]({link_zap})'
-            st.markdown(link, unsafe_allow_html=True)
+            
+            if st.checkbox(str(nome) +" - R$ "+ str(valor) + "/hora"):
+                st.markdown("*Titulo: *" + str(titulo))
+                st.markdown("*Metodologia: *" + str(metodologia))
+                st.markdown("*Motivação: *" + str(motivacao))
+                st.markdown("*Currículo: *" + str(curriculo))
+                st.markdown("*Idade: *" + str(idade))
+                t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
+                link = f'[{t}]({link_zap})'
+                st.markdown(link, unsafe_allow_html=True)
+    elif flag == 1:
+        st.markdown("Nenhum professor nessa faixa de valores :(")
             
 else:
     st.header("Aguardando o preenchimento das preferências para mostrar os resultados :smile:")
