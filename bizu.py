@@ -82,15 +82,16 @@ if nivel != '' and materia != '' and tipo != ''  and genero != '':
     # Ordenar pelo valor
     if tipo == 'Presencial' and df.shape[0] > 0:
         df = df.sort_values(by = ['valor_presencial_'+str(dict_niveis[nivel]),'idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()),step=5)
-        filtro = df['valor_presencial_'+str(dict_niveis[nivel])]<=maximo
-        df = df[filtro]
+        #maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()),step=5)
+        #maximo=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()
+        #filtro = df['valor_presencial_'+str(dict_niveis[nivel])]<=maximo
+        #df = df[filtro]
         flag = 1
     elif tipo == "Online" and df.shape[0] > 0:
         df = df.sort_values(by = ['valor_online_'+dict_niveis[nivel],'idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_online_'+str(dict_niveis[nivel])].max()), step =5)
-        filtro = df['valor_online_'+str(dict_niveis[nivel])]<=maximo
-        df = df[filtro]
+        #maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_online_'+str(dict_niveis[nivel])].max()), step =5)
+        #filtro = df['valor_online_'+str(dict_niveis[nivel])]<=maximo
+        #df = df[filtro]
         flag = 1
 
     if df.shape[0]>0:
