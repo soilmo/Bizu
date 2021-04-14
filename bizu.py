@@ -71,15 +71,20 @@ if nivel != '' and materia != '' and tipo != ''  and genero != '':
 
     # Ordenar pelo valor
     if tipo == 'Presencial':
-        df = df.sort_values(by = ['valor_presencial','idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=int(df['valor_presencial'].min()), max_value=int(df['valor_presencial'].max()))
-        filtro = df['valor_presencial']<=maximo
+        df = df.sort_values(by = ['valor_presencial_'+dict_niveis[nivel],'idade'], ascending = True)
+        maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=int(df['valor_presencial_'+dict_niveis[nivel]].min()), max_value=int(df['valor_presencial_'+dict_niveis[nivel]].max()))
+        filtro = df['valor_presencial_'+dict_niveis[nivel]]<=maximo
         df = df[filtro]
     elif tipo == "Online":
-        df = df.sort_values(by = ['valor_online','idade'], ascending = True)
-        maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=int(df['valor_online'].min()), max_value=int(df['valor_online'].max()))
-        filtro = df['valor_online']<=maximo
+        df = df.sort_values(by = ['valor_online_'+dict_niveis[nivel],'idade'], ascending = True)
+        maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=int(df['valor_online_'+dict_niveis[nivel]].min()), max_value=int(df['valor_online_'+dict_niveis[nivel]].max()))
+        filtro = df['valor_online_'+dict_niveis[nivel]]<=maximo
         df = df[filtro]
+
+    # Filtro idade
+    max_idade = st.slider('Faixa de idade. Mova o intervalo para filtrar os professores.', min_value=int(df['idade'].min()), max_value=int(df['idade'].max()))
+    filtro = df['idade']<=max_idade
+    df = df[filtro]
 
     for i in range(df.shape[0]):
         
@@ -92,9 +97,9 @@ if nivel != '' and materia != '' and tipo != ''  and genero != '':
         idade = df['idade'].iloc[i]
 
         if tipo == 'Presencial':
-            valor = df['valor_presencial'].iloc[i]
+            valor = df['valor_presencial_'+dict_niveis[nivel]].iloc[i]
         elif tipo == "Online":
-            valor = df['valor_online'].iloc[i]
+            valor = df['valor_online_'+dict_niveis[nivel]].iloc[i]
 
         st.subheader(str(nome) +" - R$ "+ str(valor) + "/hora")
         st.text(titulo)
