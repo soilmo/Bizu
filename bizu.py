@@ -10,7 +10,7 @@ dict_materias = {
     'Matemática':'mat',
     'Física':'fis',
     'Química':'quim',
-    'Inglês':'ingles',
+    'Inglês':'ing',
     'Redação':'red'
 }
 
@@ -20,7 +20,9 @@ dict_niveis = {
     'Concurso':'con'
 }
 
-# Coluna do lado
+# Ler base
+url = 'https://github.com/soilmo/Bizu/raw/main/profs.csv?raw=true'
+df = pd.read_csv(url, encoding='utf-8')
 
 #image = Image.open("https://github.com/soilmo/Bizu/blob/main/bizu_logo_pq_trans.png")
 #st.sidebar.image(image,use_column_width=True,  width= 20, )
@@ -37,15 +39,19 @@ materia = st.selectbox('Disciplina', materias)
 # Tipo de aula
 tipo = st.selectbox("Presencial ou online?",['','Presencial','Online'])
 
+# Se presencial, cidade?
+if tipo == "Presencial":
+    cidade = st.selectbox("Em qual cidade quer ter aula?", list(df['cidade'].unique()))
+    filtro = df['cidade'] == cidade
+    df = df[filtro]
+
 # Genero do prof
 genero = st.selectbox("Preferência pelo gênero do professor?", ['', 'Tanto faz', 'Mulher', 'Homem'])
 
 flag = 0
-if nivel != '' and materia != '' and tipo != ''  and genero != '':
-    
-    # Ler base
-    url = 'https://github.com/soilmo/Bizu/raw/main/profs.csv?raw=true'
-    df = pd.read_csv(url, encoding='utf-8')
+#(nivel != '' and materia != '' and tipo == "Presencial" and cidade != '' and genero != '')
+if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
+
     # Filtro tipo
     if tipo == 'Presencial':
         filtro = df['presencial']=="Sim"
