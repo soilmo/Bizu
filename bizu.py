@@ -118,7 +118,8 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
                 valor = df['valor_online_'+str(dict_niveis[nivel])].iloc[i]
 
             
-            if st.checkbox(str(nome) +" - R$ "+ str(valor) + "/hora"):
+            #if st.checkbox(str(nome) +" - R$ "+ str(valor) + "/hora"):
+            if st.checkbox(str(nome)):
                 st.markdown("*Titulo: *" + str(titulo))
                 st.markdown("*Metodologia: *" + str(metodologia))
                 st.markdown("*Motivação: *" + str(motivacao))
