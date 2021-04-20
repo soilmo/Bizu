@@ -120,6 +120,7 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
             
             #if st.checkbox(str(nome) +" - R$ "+ str(valor) + "/hora"):
             if st.checkbox(str(nome)):
+                st.markdown("*Valor hora aula: *R$ " + str(valor))
                 st.markdown("*Titulo: *" + str(titulo))
                 st.markdown("*Metodologia: *" + str(metodologia))
                 st.markdown("*Motivação: *" + str(motivacao))
