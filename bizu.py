@@ -1,5 +1,4 @@
 import pandas as pd
-from PIL import Image
 import numpy as np
 import streamlit as st
 
@@ -24,13 +23,16 @@ dict_niveis = {
 url = 'https://github.com/soilmo/Bizu/raw/main/profs.csv?raw=true'
 df = pd.read_csv(url, encoding='utf-8')
 
-#image = Image.open("https://github.com/soilmo/Bizu/blob/main/bizu_logo_pq_trans.png")
-#st.sidebar.image(image,use_column_width=True,  width= 20, )
+#image = Image.open('https://github.com/soilmo/Bizu/blob/main/bizu_logo_pq_trans.png')
+
+# Mudar título
+st.set_page_config(page_title = "Bizu", page_icon=":nerd_face:")
 
 st.title("Bizu Aulas Particulares")
 
 st.markdown("Confira os professores cadastrados e agende sua aula :smile:")
 
+# Nivel
 nivel = st.selectbox("Nível da aula",niveis)
 
 # Matéria
@@ -73,17 +75,14 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
     
     if genero == 'Mulher' and df.shape[0] > 0:
         st.header("Total de "+str(df.shape[0])+" professoras nesse perfil :smile:")
-        st.subheader("Marque a caixinha para ver o perfil completo do Professor")
     elif genero == 'Mulher' and df.shape[0] == 1:
         st.header("Total de "+str(df.shape[0])+" professora nesse perfil :smile:")
     elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] == 1:
         st.header("Total de "+str(df.shape[0])+" professor nesse perfil :smile:")
-        st.subheader("Marque a caixinha para ver o perfil completo do Professor")
     elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] > 0:
         st.header("Total de "+str(df.shape[0])+" professores nesse perfil :smile:")
-        st.subheader("Marque a caixinha para ver o perfil completo do Professor")
     elif df.shape[0]==0:
-        st.header("Ainda não temos nenhum professor nesse perfil")
+        st.header("Nenhum professor nesse perfil ainda :cry:")
 
     # Ordenar pelo valor
     if tipo == 'Presencial' and df.shape[0] > 0:
@@ -117,20 +116,23 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
             elif tipo == "Online":
                 valor = df['valor_online_'+str(dict_niveis[nivel])].iloc[i]
 
+            # Expand
+            opt = st.beta_expander(str(nome), False)
+            opt.markdown("__Valor hora aula:__ R$ " + str(valor))
+            opt.markdown("__Titulo:__ " + str(titulo))
+            opt.markdown("__Metodologia:__ " + str(metodologia))
+            opt.markdown("__Motivação:__ " + str(motivacao))
+            opt.markdown("__Currículo:__ " + str(curriculo))
+            opt.markdown("__Idade:__ " + str(idade))
+                
+            t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
+            link = f'[{t}]({link_zap})'
+            opt.markdown(link, unsafe_allow_html=True)
+
             
-            #if st.checkbox(str(nome) +" - R$ "+ str(valor) + "/hora"):
-            if st.checkbox(str(nome)):
-                st.markdown("*Valor hora aula: *R$ " + str(valor))
-                st.markdown("*Titulo: *" + str(titulo))
-                st.markdown("*Metodologia: *" + str(metodologia))
-                st.markdown("*Motivação: *" + str(motivacao))
-                st.markdown("*Currículo: *" + str(curriculo))
-                st.markdown("*Idade: *" + str(idade))
-                t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
-                link = f'[{t}]({link_zap})'
-                st.markdown(link, unsafe_allow_html=True)
+
     elif flag == 1:
-        st.markdown("Nenhum professor nessa faixa de valores :(")
-            
+        st.markdown("Nenhum professor nessa faixa de valores :cry:")
+
 else:
-    st.header("Aguardando o preenchimento das preferências para mostrar os resultados :smile:")
+    st.header("Aguardando o preenchimento das preferências :sleeping:")
