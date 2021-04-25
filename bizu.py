@@ -28,6 +28,16 @@ df = pd.read_csv(url, encoding='utf-8')
 # Mudar título
 st.set_page_config(page_title = "Bizu", page_icon=":nerd_face:")
 
+# Esconder menu canto superior direito
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 st.title("Bizu Aulas Particulares")
 
 st.markdown("Confira os professores cadastrados e agende sua aula :smile:")
