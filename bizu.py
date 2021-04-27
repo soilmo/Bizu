@@ -86,15 +86,15 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
     df = df[filtro]
     
     if genero == 'Mulher' and df.shape[0] > 0:
-        st.header("Total de "+str(df.shape[0])+" professoras nesse perfil :smile:")
+        st.markdown("Total de "+str(df.shape[0])+" professoras nesse perfil :smile:")
     elif genero == 'Mulher' and df.shape[0] == 1:
-        st.header("Total de "+str(df.shape[0])+" professora nesse perfil :smile:")
+        st.markdown("Total de "+str(df.shape[0])+" professora nesse perfil :smile:")
     elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] == 1:
-        st.header("Total de "+str(df.shape[0])+" professor nesse perfil :smile:")
+        st.markdown("Total de "+str(df.shape[0])+" professor nesse perfil :smile:")
     elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] > 0:
-        st.header("Total de "+str(df.shape[0])+" professores nesse perfil :smile:")
+        st.markdown("Total de "+str(df.shape[0])+" professores nesse perfil :smile:")
     elif df.shape[0]==0:
-        st.header("Nenhum professor nesse perfil ainda :cry:")
+        st.markdown("Nenhum professor nesse perfil ainda :cry:")
 
     # Ordenar pelo valor
     if tipo == 'Presencial' and df.shape[0] > 0:
@@ -147,5 +147,5 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
         st.markdown("Nenhum professor nessa faixa de valores :cry:")
 
 else:
-    st.header("Aguardando o preenchimento das preferências :sleeping:\n")
+    st.markdown("Aguardando o preenchimento das preferências :sleeping:")
     
