@@ -38,6 +38,8 @@ footer {visibility: hidden;}
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
+# Carregar Logo
+#st.image("https://github.com/soilmo/Bizu/blob/main/bizu_logo_pq_trans.png",width=400)
 st.title("Bizu Aulas Particulares")
 
 st.markdown("Confira os professores cadastrados e agende sua aula :smile:")
@@ -145,4 +147,5 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
         st.markdown("Nenhum professor nessa faixa de valores :cry:")
 
 else:
-    st.header("Aguardando o preenchimento das preferências :sleeping:")
+    st.header("Aguardando o preenchimento das preferências :sleeping:\n")
+    
