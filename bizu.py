@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+import streamlit_analytics
+
+streamlit_analytics.start_tracking()
 
 niveis = ['','Ensino fundamental','Ensino Médio e Pré-vestibular','Concurso']
 materias = ['','Matemática','Física','Química','Inglês','Redação']
@@ -129,23 +132,34 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
                 valor = df['valor_online_'+str(dict_niveis[nivel])].iloc[i]
 
             # Expand
-            opt = st.beta_expander(str(nome), False)
-            opt.markdown("__Valor hora aula:__ R$ " + str(valor))
-            opt.markdown("__Titulo:__ " + str(titulo))
-            opt.markdown("__Metodologia:__ " + str(metodologia))
-            opt.markdown("__Motivação:__ " + str(motivacao))
-            opt.markdown("__Currículo:__ " + str(curriculo))
-            opt.markdown("__Idade:__ " + str(idade))
-                
-            t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
-            link = f'[{t}]({link_zap})'
-            opt.markdown(link, unsafe_allow_html=True)
+            #opt = st.beta_expander(str(nome), False):st.button("foo")
+            #opt.markdown("__Valor hora aula:__ R$ " + str(valor))
+            #opt.markdown("__Titulo:__ " + str(titulo))
+            #opt.markdown("__Metodologia:__ " + str(metodologia))
+            #opt.markdown("__Motivação:__ " + str(motivacao))
+            #opt.markdown("__Currículo:__ " + str(curriculo))
+            #opt.markdown("__Idade:__ " + str(idade))
+            #t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
+            #link = f'[{t}]({link_zap})'
+            #opt.markdown(link, unsafe_allow_html=True)
 
-            
+            # Expand
+            if st.checkbox(str(nome), False):
+                st.markdown("__Valor hora aula:__ R$ " + str(valor))
+                st.markdown("__Titulo:__ " + str(titulo))
+                st.markdown("__Metodologia:__ " + str(metodologia))
+                st.markdown("__Motivação:__ " + str(motivacao))
+                st.markdown("__Currículo:__ " + str(curriculo))
+                st.markdown("__Idade:__ " + str(idade))
+                t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
+                link = f'[{t}]({link_zap})'
+                st.markdown(link, unsafe_allow_html=True)
 
     elif flag == 1:
         st.markdown("Nenhum professor nessa faixa de valores :cry:")
 
 else:
     st.markdown("Aguardando o preenchimento das preferências :sleeping:")
-    
+
+#streamlit_analytics.stop_tracking(save_to_json="C:/Users/pedro/Dropbox/Bizu/metrics.json")
+streamlit_analytics.stop_tracking()
