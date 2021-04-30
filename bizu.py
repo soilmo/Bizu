@@ -2,6 +2,64 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import streamlit_analytics
+from datetime import datetime
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+
+def enviar_email(data, nivel,materia,tipo, cidade, genero, nome):
+    
+    mail_content = "<br><b>Data</b>: " +data +"<br><b>Nivel</b>: " +nivel +"<br><b>Materia</b>: " +materia + "<br><b>Tipo:</b>" +tipo+ "<br><b>Cidade:</b>" +cidade + "<br><b>Genero:</b> " + genero + "<br><b>Nome:</b>" +nome
+    
+    #The mail addresses and password
+    sender_address = 'bizuaulasparticulares@gmail.com'
+    sender_pass = '291096santiago'
+    receiver_address = 'bizuaulasparticulares@gmail.com'
+    #Setup the MIME
+    message = MIMEMultipart()
+    message.IsBodyHtml = True
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = 'ACESSO | ' + data + " | " + nome   #The subject line
+    #The body and the attachments for the mail
+    #message.Body = mail_content
+    message.attach(MIMEText(mail_content, 'html'))
+    #message.attach(MIMEText(mail_content, 'plain'))
+    #Create SMTP session for sending the mail
+    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session.starttls() #enable security
+    session.login(sender_address, sender_pass) #login with mail_id and password
+    text = message.as_string()
+    session.sendmail(sender_address, receiver_address, text)
+    session.quit()
+
+# Busca
+@st.cache(persist=True, max_entries = 20, ttl = 1800, show_spinner=False)
+def filtro_busca(df, nivel,materia,tipo, genero):
+    
+    # Filtro tipo
+    if tipo == 'Presencial':
+        filtro = df['presencial']=="Sim"
+        df = df[filtro]
+    else:
+        filtro = df['online']=="Sim"
+        df = df[filtro]
+    # Filtro genero
+    if genero == 'Mulher':
+        filtro = df['genero']=="Feminino"
+        df = df[filtro]
+    elif genero == 'Homem':
+        filtro = df['genero']=="Masculino"
+        df = df[filtro]
+    
+    # Nivel_materia
+    filtro = df[dict_niveis[nivel]+"_"+dict_materias[materia]]==1
+    df = df[filtro]
+
+    return df
+
 
 streamlit_analytics.start_tracking()
 
@@ -57,6 +115,7 @@ materia = st.selectbox('Disciplina', materias)
 tipo = st.selectbox("Presencial ou online?",['','Presencial','Online'])
 
 # Se presencial, cidade?
+cidade = "NA"
 if tipo == "Presencial":
     cidade = st.selectbox("Em qual cidade quer ter aula?", list(df['cidade'].unique()))
     filtro = df['cidade'] == cidade
@@ -66,27 +125,9 @@ if tipo == "Presencial":
 genero = st.selectbox("Preferência pelo gênero do professor?", ['', 'Tanto faz', 'Mulher', 'Homem'])
 
 flag = 0
-#(nivel != '' and materia != '' and tipo == "Presencial" and cidade != '' and genero != '')
 if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
-
-    # Filtro tipo
-    if tipo == 'Presencial':
-        filtro = df['presencial']=="Sim"
-        df = df[filtro]
-    else:
-        filtro = df['online']=="Sim"
-        df = df[filtro]
-    # Filtro genero
-    if genero == 'Mulher':
-        filtro = df['genero']=="Feminino"
-        df = df[filtro]
-    elif genero == 'Homem':
-        filtro = df['genero']=="Masculino"
-        df = df[filtro]
     
-    # Nivel_materia
-    filtro = df[dict_niveis[nivel]+"_"+dict_materias[materia]]==1
-    df = df[filtro]
+    df = filtro_busca(df, nivel,materia,tipo, genero)
     
     if genero == 'Mulher' and df.shape[0] > 0:
         st.markdown("Total de "+str(df.shape[0])+" professoras nesse perfil :smile:")
@@ -145,6 +186,7 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
 
             # Expand
             if st.checkbox(str(nome), False):
+                
                 st.markdown("__Valor hora aula:__ R$ " + str(valor))
                 st.markdown("__Titulo:__ " + str(titulo))
                 st.markdown("__Metodologia:__ " + str(metodologia))
@@ -154,7 +196,10 @@ if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
                 t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
                 link = f'[{t}]({link_zap})'
                 st.markdown(link, unsafe_allow_html=True)
-
+                # Enviar email
+                date_time = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
+                enviar_email(date_time,nivel,materia,tipo, cidade, genero,str(nome))
+                
     elif flag == 1:
         st.markdown("Nenhum professor nessa faixa de valores :cry:")
 
