@@ -9,9 +9,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
-def enviar_email(data, nivel,materia,tipo, cidade, genero, nome):
+def enviar_email(data, aluno, contato, nivel,materia,tipo, cidade, genero, nome):
     
-    mail_content = "<br><b>Data</b>: " +data +"<br><b>Nivel</b>: " +nivel +"<br><b>Materia</b>: " +materia + "<br><b>Tipo:</b>" +tipo+ "<br><b>Cidade:</b>" +cidade + "<br><b>Genero:</b> " + genero + "<br><b>Nome:</b>" +nome
+    mail_content = "<br><b>Data</b>: " +data+"<br><b>Aluno</b>: " +aluno  +"<br><b>contato</b>: " +contato  +"<br><b>Nivel</b>: " +nivel +"<br><b>Materia</b>: " +materia + "<br><b>Tipo:</b> " +tipo+ "<br><b>Cidade:</b> " +cidade + "<br><b>Genero:</b> " + genero + "<br><b>Nome:</b> " +nome
     
     #The mail addresses and password
     sender_address = 'bizuaulasparticulares@gmail.com'
@@ -61,7 +61,7 @@ def filtro_busca(df, nivel,materia,tipo, genero):
     return df
 
 
-streamlit_analytics.start_tracking()
+#streamlit_analytics.start_tracking()
 
 niveis = ['','Ensino fundamental','Ensino Médio e Pré-vestibular','Concurso']
 materias = ['','Matemática','Física','Química','Inglês','Redação']
@@ -84,8 +84,6 @@ dict_niveis = {
 url = 'https://github.com/soilmo/Bizu/raw/main/profs.csv?raw=true'
 df = pd.read_csv(url, encoding='utf-8')
 
-#image = Image.open('https://github.com/soilmo/Bizu/blob/main/bizu_logo_pq_trans.png')
-
 # Mudar título
 st.set_page_config(page_title = "Bizu", page_icon=":nerd_face:")
 
@@ -105,106 +103,113 @@ st.title("Bizu Aulas Particulares")
 
 st.markdown("Confira os professores cadastrados e agende sua aula :smile:")
 
-# Nivel
-nivel = st.selectbox("Nível da aula",niveis)
+t = '*Dúvidas? Clique aqui para falar com a gente*'
+link_bizu = 'https://api.whatsapp.com/send?phone=5585999408919&text=Oi%20Bizu%2C%20estou%20com%20d%C3%BAvidas.%20Pode%20me%20ajudar%3F'
+st.markdown(f'[{t}]({link_bizu})', unsafe_allow_html=True)
 
-# Matéria
-materia = st.selectbox('Disciplina', materias)
+# Contato
+contato = st.text_input("Qual seu contato? E-mail, Whatsapp ou Instagram. É opcional.", "")
 
-# Tipo de aula
-tipo = st.selectbox("Presencial ou online?",['','Presencial','Online'])
+if contato=="":
+    st.warning("Para receber avisos, dicas e promoções exclusivas, recomenda-se indicar algum contato :grimacing:")
+else:
+    st.success("Boa! Entraremos em contato para te informar as formas que a Bizu pode te ajudar :smile:")
 
-# Se presencial, cidade?
-cidade = "NA"
-if tipo == "Presencial":
-    cidade = st.selectbox("Em qual cidade quer ter aula?", list(df['cidade'].unique()))
-    filtro = df['cidade'] == cidade
-    df = df[filtro]
+# Nome solicitante
+aluno = st.text_input("Qual seu nome?", "")
+if aluno == "":
+    st.warning("Preencha seu nome para prosseguir :pray:")
+else:
 
-# Genero do prof
-genero = st.selectbox("Preferência pelo gênero do professor?", ['', 'Tanto faz', 'Mulher', 'Homem'])
+    # Escolher preferencias --------------------------------
 
-flag = 0
-if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
-    
-    df = filtro_busca(df, nivel,materia,tipo, genero)
-    
-    if genero == 'Mulher' and df.shape[0] > 0:
-        st.markdown("Total de "+str(df.shape[0])+" professoras nesse perfil :smile:")
-    elif genero == 'Mulher' and df.shape[0] == 1:
-        st.markdown("Total de "+str(df.shape[0])+" professora nesse perfil :smile:")
-    elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] == 1:
-        st.markdown("Total de "+str(df.shape[0])+" professor nesse perfil :smile:")
-    elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] > 0:
-        st.markdown("Total de "+str(df.shape[0])+" professores nesse perfil :smile:")
-    elif df.shape[0]==0:
-        st.markdown("Nenhum professor nesse perfil ainda :cry:")
+    # Nivel
+    nivel = st.selectbox("Nível da aula",niveis)
+    # Matéria
+    materia = st.selectbox('Disciplina', materias)
+    # Tipo de aula
+    tipo = st.selectbox("Presencial ou online?",['','Presencial','Online'])
+    # Se presencial, cidade?
+    cidade = "NA"
+    if tipo == "Presencial":
+        cidade = st.selectbox("Em qual cidade quer ter aula?", list(df['cidade'].unique()))
+        filtro = df['cidade'] == cidade
+        df = df[filtro]
+    # Genero do prof
+    genero = st.selectbox("Preferência pelo gênero do professor?", ['', 'Tanto faz', 'Mulher', 'Homem'])
+    # -------------------------------------------
 
-    # Ordenar pelo valor
-    if tipo == 'Presencial' and df.shape[0] > 0:
-        df = df.sort_values(by = ['valor_presencial_'+str(dict_niveis[nivel]),'idade'], ascending = True)
-        #maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()),step=5)
-        #maximo=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()
-        #filtro = df['valor_presencial_'+str(dict_niveis[nivel])]<=maximo
-        #df = df[filtro]
-        flag = 1
-    elif tipo == "Online" and df.shape[0] > 0:
-        df = df.sort_values(by = ['valor_online_'+dict_niveis[nivel],'idade'], ascending = True)
-        #maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_online_'+str(dict_niveis[nivel])].max()), step =5)
-        #filtro = df['valor_online_'+str(dict_niveis[nivel])]<=maximo
-        #df = df[filtro]
-        flag = 1
+    flag = 0
+    if  (nivel != '' and materia != '' and tipo != "" and genero != ''):
+        
+        df = filtro_busca(df, nivel,materia,tipo, genero)
+        
+        if genero == 'Mulher' and df.shape[0] > 0:
+            st.markdown("Total de "+str(df.shape[0])+" professoras nesse perfil :smile:")
+        elif genero == 'Mulher' and df.shape[0] == 1:
+            st.markdown("Total de "+str(df.shape[0])+" professora nesse perfil :smile:")
+        elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] == 1:
+            st.markdown("Total de "+str(df.shape[0])+" professor nesse perfil :smile:")
+        elif (genero == 'Homem' or genero == "Tanto faz") and df.shape[0] > 0:
+            st.markdown("Total de "+str(df.shape[0])+" professores nesse perfil :smile:")
+        elif df.shape[0]==0:
+            st.markdown("Nenhum professor nesse perfil ainda :cry:")
 
-    if df.shape[0]>0:
+        # Ordenar pelo valor
+        if tipo == 'Presencial' and df.shape[0] > 0:
+            df = df.sort_values(by = ['valor_presencial_'+str(dict_niveis[nivel]),'idade'], ascending = True)
+            #maximo = st.slider('Faixa de preço da aula presencial. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()),step=5)
+            #maximo=int(df['valor_presencial_'+str(dict_niveis[nivel])].max()
+            #filtro = df['valor_presencial_'+str(dict_niveis[nivel])]<=maximo
+            #df = df[filtro]
+            flag = 1
+        elif tipo == "Online" and df.shape[0] > 0:
+            df = df.sort_values(by = ['valor_online_'+dict_niveis[nivel],'idade'], ascending = True)
+            #maximo = st.slider('Faixa de preço da aula online. Mova o intervalo para filtrar os professores.', min_value=0, max_value=int(df['valor_online_'+str(dict_niveis[nivel])].max()), step =5)
+            #filtro = df['valor_online_'+str(dict_niveis[nivel])]<=maximo
+            #df = df[filtro]
+            flag = 1
 
-        for i in range(df.shape[0]):
-            
-            nome = df['nome'].iloc[i]
-            titulo = df['titulo'].iloc[i]
-            metodologia = df['metodologia'].iloc[i]
-            motivacao = df['motivacao'].iloc[i]
-            curriculo = df['curriculo'].iloc[i]
-            link_zap = df['link_zap'].iloc[i]
-            idade = df['idade'].iloc[i]
-
-            if tipo == 'Presencial':
-                valor = df['valor_presencial_'+str(dict_niveis[nivel])].iloc[i]
-            elif tipo == "Online":
-                valor = df['valor_online_'+str(dict_niveis[nivel])].iloc[i]
-
+        if df.shape[0]>0:
             # Expand
-            #opt = st.beta_expander(str(nome), False):st.button("foo")
-            #opt.markdown("__Valor hora aula:__ R$ " + str(valor))
-            #opt.markdown("__Titulo:__ " + str(titulo))
-            #opt.markdown("__Metodologia:__ " + str(metodologia))
-            #opt.markdown("__Motivação:__ " + str(motivacao))
-            #opt.markdown("__Currículo:__ " + str(curriculo))
-            #opt.markdown("__Idade:__ " + str(idade))
-            #t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
-            #link = f'[{t}]({link_zap})'
-            #opt.markdown(link, unsafe_allow_html=True)
+            nome = st.selectbox("Professor",['Escolha o prof']+list(df['nome']))
+            if nome != "Escolha o prof":
 
-            # Expand
-            if st.checkbox(str(nome), False):
-                
+            #for i in range(df.shape[0]):
+                filtro = df['nome']==nome
+
+                titulo = df[filtro]['titulo'].iloc[0]
+                metodologia = df[filtro]['metodologia'].iloc[0]
+                motivacao = df[filtro]['motivacao'].iloc[0]
+                curriculo = df[filtro]['curriculo'].iloc[0]
+                link_zap = df[filtro]['link_zap'].iloc[0]
+                idade = df[filtro]['idade'].iloc[0]
+
+                if tipo == 'Presencial':
+                    valor = df[filtro]['valor_presencial_'+str(dict_niveis[nivel])].iloc[0]
+                elif tipo == "Online":
+                    valor = df[filtro]['valor_online_'+str(dict_niveis[nivel])].iloc[0]
+
+                #if st.checkbox(str(nome), False):
                 st.markdown("__Valor hora aula:__ R$ " + str(valor))
                 st.markdown("__Titulo:__ " + str(titulo))
                 st.markdown("__Metodologia:__ " + str(metodologia))
                 st.markdown("__Motivação:__ " + str(motivacao))
                 st.markdown("__Currículo:__ " + str(curriculo))
                 st.markdown("__Idade:__ " + str(idade))
-                t = '*Mandar mensagem no Whatsapp de ' +str(nome.split(" ")[0])+ '*'
+                t = '*Mensagem no Zap de ' +str(nome.split(" ")[0])+ '*'
                 link = f'[{t}]({link_zap})'
                 st.markdown(link, unsafe_allow_html=True)
+                
                 # Enviar email
                 date_time = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
-                enviar_email(date_time,nivel,materia,tipo, cidade, genero,str(nome))
+                #enviar_email(date_time,aluno, contato,nivel,materia,tipo, cidade, genero,str(nome))
                 
-    elif flag == 1:
-        st.markdown("Nenhum professor nessa faixa de valores :cry:")
+        elif flag == 1:
+            st.markdown("Nenhum professor nessa faixa de valores :cry:")
 
-else:
-    st.markdown("Aguardando o preenchimento das preferências :sleeping:")
+    else:
+        st.markdown("Aguardando o preenchimento das preferências :sleeping:")
 
-#streamlit_analytics.stop_tracking(save_to_json="C:/Users/pedro/Dropbox/Bizu/metrics.json")
-streamlit_analytics.stop_tracking()
+    #streamlit_analytics.stop_tracking(save_to_json="C:/Users/pedro/Dropbox/Bizu/metrics.json")
+    #streamlit_analytics.stop_tracking()
