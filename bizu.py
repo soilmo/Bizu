@@ -203,7 +203,7 @@ else:
                 
                 # Enviar email
                 date_time = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
-                #enviar_email(date_time,aluno, contato,nivel,materia,tipo, cidade, genero,str(nome))
+                enviar_email(date_time,aluno, contato,nivel,materia,tipo, cidade, genero,str(nome))
                 
         elif flag == 1:
             st.markdown("Nenhum professor nessa faixa de valores :cry:")
