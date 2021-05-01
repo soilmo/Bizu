@@ -22,7 +22,7 @@ def enviar_email(data, aluno, contato, nivel,materia,tipo, cidade, genero, nome)
     message.IsBodyHtml = True
     message['From'] = sender_address
     message['To'] = receiver_address
-    message['Subject'] = 'ACESSO | ' + data + " | " + nome   #The subject line
+    message['Subject'] = data+"|"+ aluno+"|"+contato+"|"+ nivel+"|"+ materia+"|"+ tipo+"|"+ cidade+"|"+ genero+"|"+ nome   #The subject line
     #The body and the attachments for the mail
     #message.Body = mail_content
     message.attach(MIMEText(mail_content, 'html'))
