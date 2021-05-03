@@ -8,8 +8,33 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+@st.cache(persist=True, max_entries = 20, ttl = 1800, show_spinner=False)
+def enviar_email_site(data):
+    
+    mail_content = "<br><b>Data</b>: " +data
+    #The mail addresses and password
+    sender_address = 'bizuaulasparticulares@gmail.com'
+    sender_pass = '291096santiago'
+    receiver_address = 'bizuaulasparticulares@gmail.com'
+    #Setup the MIME
+    message = MIMEMultipart()
+    message.IsBodyHtml = True
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = "NOVO ACESSO " + " | " + data
+    #message.Body = mail_content
+    message.attach(MIMEText(mail_content, 'html'))
+    #message.attach(MIMEText(mail_content, 'plain'))
+    #Create SMTP session for sending the mail
+    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session.starttls() #enable security
+    session.login(sender_address, sender_pass) #login with mail_id and password
+    text = message.as_string()
+    session.sendmail(sender_address, receiver_address, text)
+    session.quit()
 
-def enviar_email(data, aluno, contato, nivel,materia,tipo, cidade, genero, nome):
+@st.cache(persist=True, max_entries = 20, ttl = 1800, show_spinner=False)
+def enviar_email_prof(data, aluno, contato, nivel,materia,tipo, cidade, genero, nome):
     
     mail_content = "<br><b>Data</b>: " +data+"<br><b>Aluno</b>: " +aluno  +"<br><b>contato</b>: " +contato  +"<br><b>Nivel</b>: " +nivel +"<br><b>Materia</b>: " +materia + "<br><b>Tipo:</b> " +tipo+ "<br><b>Cidade:</b> " +cidade + "<br><b>Genero:</b> " + genero + "<br><b>Nome:</b> " +nome
     
@@ -22,7 +47,7 @@ def enviar_email(data, aluno, contato, nivel,materia,tipo, cidade, genero, nome)
     message.IsBodyHtml = True
     message['From'] = sender_address
     message['To'] = receiver_address
-    message['Subject'] = data+"|"+ aluno+"|"+contato+"|"+ nivel+"|"+ materia+"|"+ tipo+"|"+ cidade+"|"+ genero+"|"+ nome   #The subject line
+    message['Subject'] = data + " | "+ aluno+" | "+contato+" | "+ nivel+" | "+ materia+" | "+ tipo+" | "+ cidade+" | "+ genero+" | "+ nome   #The subject line
     #The body and the attachments for the mail
     #message.Body = mail_content
     message.attach(MIMEText(mail_content, 'html'))
@@ -117,6 +142,7 @@ else:
 
 # Nome solicitante
 aluno = st.text_input("Qual seu nome?", "")
+
 if aluno == "":
     st.warning("Preencha seu nome para prosseguir :pray:")
 else:
@@ -131,7 +157,12 @@ else:
     tipo = st.selectbox("Presencial ou online?",['','Presencial','Online'])
     # Se presencial, cidade?
     cidade = "NA"
+    estado = "NA"
     if tipo == "Presencial":
+        estado = st.selectbox("Em qual estado quer ter aula?", list(df['estado'].unique()))
+        filtro = df['estado'] == estado
+        df = df[filtro]
+        
         cidade = st.selectbox("Em qual cidade quer ter aula?", list(df['cidade'].unique()))
         filtro = df['cidade'] == cidade
         df = df[filtro]
@@ -201,9 +232,9 @@ else:
                 link = f'[{t}]({link_zap})'
                 st.markdown(link, unsafe_allow_html=True)
                 
-                # Enviar email
+                # Enviar email acesso prof
                 date_time = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
-                enviar_email(date_time,aluno, contato,nivel,materia,tipo, cidade, genero,str(nome))
+                enviar_email_prof(date_time,aluno, contato,nivel,materia,tipo, cidade, genero,str(nome))
                 
         elif flag == 1:
             st.markdown("Nenhum professor nessa faixa de valores :cry:")
