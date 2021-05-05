@@ -86,7 +86,7 @@ def filtro_busca(df, nivel,materia,tipo, genero):
     return df
 
 
-#streamlit_analytics.start_tracking()
+streamlit_analytics.start_tracking()
 
 niveis = ['','Ensino fundamental','Ensino Médio e Pré-vestibular','Concurso']
 materias = ['','Matemática','Física','Química','Inglês','Redação']
@@ -243,4 +243,4 @@ else:
         st.markdown("Aguardando o preenchimento das preferências :sleeping:")
 
     #streamlit_analytics.stop_tracking(save_to_json="C:/Users/pedro/Dropbox/Bizu/metrics.json")
-    #streamlit_analytics.stop_tracking()
+    streamlit_analytics.stop_tracking()
